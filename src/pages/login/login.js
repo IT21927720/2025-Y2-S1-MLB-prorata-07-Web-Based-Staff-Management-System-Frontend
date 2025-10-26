@@ -12,18 +12,28 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  const onChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const onChange = (e) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const validate = () => {
     if (!form.email.trim() || !form.password.trim()) {
       toast.error("Email and password are required.");
       return false;
     }
+
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
     if (!emailOk) {
       toast.error("Invalid email format.");
       return false;
     }
+
+    // ✅ Only HR or Manager emails allowed
+    const allowed = form.email.toLowerCase().includes("hr") || form.email.toLowerCase().includes("manager");
+    if (!allowed) {
+      toast.error("Access restricted — only HR or Manager accounts can log in.");
+      return false;
+    }
+
     return true;
   };
 
@@ -60,7 +70,7 @@ export default function Login() {
   return (
     <div className="ws-login-wrap">
       <form className="ws-login-card" onSubmit={onSubmit}>
-        <h2>Sign in</h2>
+        <h2>HR / Manager Login</h2>
 
         <label>Email</label>
         <input
@@ -68,7 +78,7 @@ export default function Login() {
           name="email"
           value={form.email}
           onChange={onChange}
-          placeholder="you@example.com"
+          placeholder="e.g., hr@company.com or manager@company.com"
         />
 
         <label>Password</label>
@@ -85,8 +95,7 @@ export default function Login() {
         </button>
 
         <p className="ws-login-alt">
-          No account?{" "}
-          <span onClick={() => navigate("/signup")}>Sign up</span>
+          No account? <span onClick={() => navigate("/signup")}>Sign up</span>
         </p>
       </form>
 
